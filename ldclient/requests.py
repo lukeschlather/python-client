@@ -2,6 +2,8 @@ from __future__ import absolute_import
 import errno
 import json
 from threading import Thread
+
+import time
 from cachecontrol import CacheControl
 from ldclient.util import log
 from ldclient.interfaces import FeatureRequester, StreamProcessor, EventConsumer
@@ -50,13 +52,14 @@ class RequestsFeatureRequester(FeatureRequester):
             self._config.connect, self._config.read))
         r.raise_for_status()
         feature = r.json()
+        log.debug("Called api and got back response: " + str(feature))
         return feature
 
 
 class RequestsStreamProcessor(Thread, StreamProcessor):
 
     def __init__(self, api_key, config, store):
-        Thread.__init__(self)
+        Thread.__init__(self, name="LaunchDarkly StreamProcessor")
         self.daemon = True
         self._api_key = api_key
         self._config = config
@@ -100,7 +103,7 @@ class RequestsStreamProcessor(Thread, StreamProcessor):
 class RequestsEventConsumer(Thread, EventConsumer):
 
     def __init__(self, event_queue, api_key, config):
-        Thread.__init__(self)
+        Thread.__init__(self, name="LaunchDarkly Event Consumer")
         self._session = requests.Session()
         self.daemon = True
         self._api_key = api_key
@@ -112,6 +115,8 @@ class RequestsEventConsumer(Thread, EventConsumer):
         log.debug("Starting event consumer")
         self._running = True
         while self._running:
+            time.sleep(5)
+            log.debug("Sending event(s)..")
             self.send()
 
     def stop(self):
@@ -158,6 +163,7 @@ class RequestsEventConsumer(Thread, EventConsumer):
         if len(events) == 0:
             return
         else:
+            log.debug("Sending: " + str(len(events)))
             self.send_batch(events)
 
     def next(self):

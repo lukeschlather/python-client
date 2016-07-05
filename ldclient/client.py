@@ -1,4 +1,7 @@
 from __future__ import division, with_statement, absolute_import
+
+import threading
+
 from builtins import object
 import time
 
@@ -91,7 +94,9 @@ class InMemoryFeatureStore(FeatureStore):
             self._lock.rlock()
             f = self._features.get(key)
             if f is None or 'deleted' in f and f['deleted']:
+                log.warn("Tried to get deleted feature from store: " + str(key))
                 return None
+            log.debug("Get from feature store for key: " + str(key) + " returned: " + str(f))
             return f
         finally:
             self._lock.runlock()
@@ -226,6 +231,8 @@ class LDClient(object):
         return self.toggle(key, user, default)
 
     def toggle(self, key, user, default=False):
+        log.debug("Toggling...")
+        log.debug("Threads: " + str(threading.enumerate()))
         self._sanitize_user(user)
         default = self._config.get_default(key, default)
 
