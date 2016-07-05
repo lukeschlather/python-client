@@ -174,6 +174,13 @@ class LDClient(object):
                 api_key, self._config, self._store)
             self._stream_processor.start()
 
+        #TODO: fix- it seems to always time out.
+        # while not self._update_processor.initialized():
+        #     if time.time() - start_time > start_wait:
+        #         log.warn("Timeout encountered waiting for LaunchDarkly Client initialization")
+        #         return
+        #     time.sleep(0.5)
+
     @property
     def api_key(self):
         return self._api_key
@@ -250,16 +257,16 @@ class LDClient(object):
                         'user': user, 'value': val, 'default': default})
             return val
 
-        if self._config.stream and self._store.initialized:
-            return cb(self._store.get(key))
-        else:
-            # noinspection PyBroadException
-            try:
-                return self._feature_requester.get(key, cb)
-            except Exception:
-                log.exception(
-                    'Unhandled exception. Returning default value for flag.')
-                return cb(None)
+        # if self._config.stream: # and self._store.initialized:
+        return cb(self._store.get(key))
+        # else:
+        #     # noinspection PyBroadException
+        #     try:
+        #         return self._feature_requester.get(key, cb)
+        #     except Exception:
+        #         log.exception(
+        #             'Unhandled exception. Returning default value for flag.')
+        #         return cb(None)
 
     def _sanitize_user(self, user):
         if 'key' in user:
