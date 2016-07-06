@@ -178,14 +178,14 @@ class LDClient(object):
             self._stream_processor.start()
 
         #TODO: fix- it seems to always time out.
-        start_time = time.time()
-        while not self._store.initialized:
-            if time.time() - start_time > 30:
-                log.warn("Timeout encountered waiting for LaunchDarkly Client initialization")
-                return
-            time.sleep(1)
-
-        log.info("Started client.")
+        # start_time = time.time()
+        # while not self._store.initialized:
+        #     if time.time() - start_time > 30:
+        #         log.warn("Timeout encountered waiting for LaunchDarkly Client initialization")
+        #         return
+        #     time.sleep(1)
+        #
+        # log.info("Started client.")
 
     @property
     def api_key(self):
