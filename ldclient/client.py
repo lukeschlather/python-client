@@ -93,7 +93,10 @@ class InMemoryFeatureStore(FeatureStore):
         try:
             self._lock.rlock()
             f = self._features.get(key)
-            if f is None or 'deleted' in f and f['deleted']:
+            if f is None:
+                log.warn("Tried to get missing feature from store: " + str(key))
+                return None
+            if 'deleted' in f and f['deleted']:
                 log.warn("Tried to get deleted feature from store: " + str(key))
                 return None
             log.debug("Get from feature store for key: " + str(key) + " returned: " + str(f))
@@ -175,11 +178,14 @@ class LDClient(object):
             self._stream_processor.start()
 
         #TODO: fix- it seems to always time out.
-        # while not self._update_processor.initialized():
-        #     if time.time() - start_time > start_wait:
-        #         log.warn("Timeout encountered waiting for LaunchDarkly Client initialization")
-        #         return
-        #     time.sleep(0.5)
+        start_time = time.time()
+        while not self._store.initialized:
+            if time.time() - start_time > 30:
+                log.warn("Timeout encountered waiting for LaunchDarkly Client initialization")
+                return
+            time.sleep(1)
+
+        log.info("Started client.")
 
     @property
     def api_key(self):
