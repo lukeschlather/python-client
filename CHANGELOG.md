@@ -4,7 +4,7 @@ All notable changes to the LaunchDarkly Python SDK will be documented in this fi
 
 ## [4.0.2] - 2017-02-02
 ### Added
-- Support for Python 2.6
+- Support for Python 2.6.
 
 ## [4.0.1] - 2017-01-10
 ### Changed
