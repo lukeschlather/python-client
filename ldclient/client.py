@@ -85,7 +85,7 @@ class LDClient(object):
         self._update_processor.start()
         log.info("Waiting up to " + str(start_wait) + " seconds for LaunchDarkly client to initialize...")
 
-        loops = start_wait / 10
+        loops = start_wait * 10
         while not update_processor_ready.is_set() and loops > 0:
             time.sleep(0.1)
             loops - 1
