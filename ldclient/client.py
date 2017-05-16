@@ -88,7 +88,7 @@ class LDClient(object):
         loops = start_wait * 10
         while not update_processor_ready.is_set() and loops > 0:
             time.sleep(0.1)
-            loops - 1
+            loops -= 1
             log.debug("looping waiting for launchdarkly to start")
 
         if self._update_processor.initialized() is True:
